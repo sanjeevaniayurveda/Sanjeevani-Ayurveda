@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#051b11">
-    <title>Sanjivani Ayurved</title>
+    <title>Sanjivani Ayurveda</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Yatra+One&family=Tiro+Devanagari+Marathi:ital@0;1&family=Manrope:wght@300;500;700;800&display=swap" rel="stylesheet">
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     
@@ -462,36 +463,33 @@
             });
         }
 
-        // DYNAMIC SCROLL ANIMATION (ENTER/LEAVE)
+        // DYNAMIC SCROLL ANIMATION (TIMELINE FOR RE-ENTRY)
         function triggerScrollAnims() {
             const cards = document.querySelectorAll('.zomato-card');
             cards.forEach((card, i) => {
                 const isLeft = i % 2 === 0; 
-                const startX = isLeft ? -100 : 100;
+                const edgeX = isLeft ? -100 : 100;
                 
-                gsap.fromTo(card, 
-                    { x: startX, opacity: 0 }, // Start state
-                    {
-                        x: 0, 
-                        opacity: 1,
-                        duration: 0.6,
-                        ease: "power2.out",
-                        scrollTrigger: {
-                            trigger: card,
-                            start: "top 90%",  // Enter view
-                            end: "bottom 10%", // Leave view
-                            toggleActions: "play reverse play reverse", // Enter:Play, Leave:Reverse, EnterBack:Play, LeaveBack:Reverse
-                            onEnter: () => {
-                                const rect = card.getBoundingClientRect();
-                                blastScrollConfetti(rect.top + rect.height/2, isLeft ? 'left' : 'right');
-                            },
-                            onEnterBack: () => {
-                                const rect = card.getBoundingClientRect();
-                                blastScrollConfetti(rect.top + rect.height/2, isLeft ? 'left' : 'right');
-                            }
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 100%", // Enter viewport
+                        end: "bottom -10%", // Leave viewport
+                        scrub: 1,
+                        onEnter: () => {
+                            const rect = card.getBoundingClientRect();
+                            blastScrollConfetti(rect.top + rect.height/2, isLeft ? 'left' : 'right');
+                        },
+                        onEnterBack: () => {
+                            const rect = card.getBoundingClientRect();
+                            blastScrollConfetti(rect.top + rect.height/2, isLeft ? 'left' : 'right');
                         }
                     }
-                );
+                });
+
+                tl.fromTo(card, { x: edgeX, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out" }) // ENTER
+                  .to(card, { x: 0, duration: 2 }) // HOLD CENTER
+                  .to(card, { x: edgeX, opacity: 0, duration: 1, ease: "power2.in" }); // EXIT TO EDGE
             });
         }
 
@@ -522,14 +520,12 @@
             const centerX = rect.left + rect.width/2;
             const centerY = rect.top + rect.height/2;
             const colorClass = type === 'add' ? 'leaf-green' : 'leaf-red';
-            
             for(let i=0; i<10; i++) {
                 const el = document.createElement('div');
                 el.classList.add('leaf-particle', colorClass);
                 el.style.left = centerX + 'px';
                 el.style.top = centerY + 'px';
                 document.body.appendChild(el);
-                
                 gsap.to(el, {
                     x: (Math.random() - 0.5) * 100,
                     y: (Math.random() - 0.5) * 100,
