@@ -112,7 +112,19 @@
         .cart-badge.visible { opacity: 1; transform: scale(1); }
 
         .hero-section { text-align: center; padding: 30px 5px 30px; }
-        .main-title { font-size: clamp(32px, 8vw, 56px); color: var(--royal-gold); margin: 0; line-height: 1.1; text-shadow: 0 4px 25px rgba(212, 175, 55, 0.4); font-weight: 400; white-space: nowrap; }
+        
+        /* --- TITLE FIX: SMART SCALING --- */
+        .main-title { 
+            /* 56px on desktop, but scales down to fit phone width (11vw) */
+            font-size: min(56px, 11vw); 
+            color: var(--royal-gold); 
+            margin: 0; 
+            line-height: 1.1; 
+            text-shadow: 0 4px 25px rgba(212, 175, 55, 0.4); 
+            font-weight: 400; 
+            white-space: nowrap; /* FORCE ONE LINE */
+        }
+        
         .sub-title { font-size: 24px; color: var(--cream); margin-top: 5px; display: block; opacity: 0.9; font-family: 'Yatra One'; letter-spacing: 1px; }
         .tagline { font-family: 'Manrope', sans-serif; color: rgba(245, 245, 220, 0.8); font-size: 13px; margin-top: 20px; letter-spacing: 0.5px; background: rgba(212,175,55,0.1); display: inline-block; padding: 6px 18px; border-radius: 50px; border: 1px solid rgba(212,175,55,0.3); }
 
@@ -463,18 +475,19 @@
             });
         }
 
-        // FIXED: SCROLL ANIMATION (ENTER -> HOLD -> EXIT)
+        // SCROLL ANIMATION (ENTER -> HOLD -> EXIT)
         function triggerScrollAnims() {
             const cards = document.querySelectorAll('.zomato-card');
             cards.forEach((card, i) => {
                 const isLeft = i % 2 === 0; 
                 const edgeX = isLeft ? -100 : 100;
                 
+                // TIMELINE: ENTERS from edge, STAYS, then LEAVES to edge
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: card,
-                        start: "top bottom", // When card top hits viewport bottom
-                        end: "bottom top",   // When card bottom hits viewport top
+                        start: "top 100%", // Card entering viewport
+                        end: "top 0%",    // Card hitting top of viewport
                         scrub: 1,
                         onEnter: () => {
                             const rect = card.getBoundingClientRect();
@@ -487,12 +500,9 @@
                     }
                 });
 
-                // 1. Enter from Edge
-                tl.fromTo(card, { x: edgeX, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out" })
-                  // 2. Stay in center for a while
-                  .to(card, { x: 0, duration: 2 })
-                  // 3. Exit to Edge
-                  .to(card, { x: edgeX, opacity: 0, duration: 1, ease: "power2.in" });
+                tl.fromTo(card, { x: edgeX, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out" }) // 0-15% Scroll
+                  .to(card, { x: 0, duration: 5 }) // 15-85% Scroll (Hold Position)
+                  .to(card, { x: edgeX, opacity: 0, duration: 1, ease: "power2.in" }); // 85-100% Scroll (Exit)
             });
         }
 
