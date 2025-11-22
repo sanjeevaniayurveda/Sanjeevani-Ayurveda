@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#051b11">
-    <title>Sanjivani Ayurveda</title>
+    <title>Sanjivani Ayurved</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -463,7 +463,7 @@
             });
         }
 
-        // DYNAMIC SCROLL ANIMATION (TIMELINE FOR RE-ENTRY)
+        // FIXED: SCROLL ANIMATION (ENTER -> HOLD -> EXIT)
         function triggerScrollAnims() {
             const cards = document.querySelectorAll('.zomato-card');
             cards.forEach((card, i) => {
@@ -473,8 +473,8 @@
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: card,
-                        start: "top 100%", // Enter viewport
-                        end: "bottom -10%", // Leave viewport
+                        start: "top bottom", // When card top hits viewport bottom
+                        end: "bottom top",   // When card bottom hits viewport top
                         scrub: 1,
                         onEnter: () => {
                             const rect = card.getBoundingClientRect();
@@ -487,9 +487,12 @@
                     }
                 });
 
-                tl.fromTo(card, { x: edgeX, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out" }) // ENTER
-                  .to(card, { x: 0, duration: 2 }) // HOLD CENTER
-                  .to(card, { x: edgeX, opacity: 0, duration: 1, ease: "power2.in" }); // EXIT TO EDGE
+                // 1. Enter from Edge
+                tl.fromTo(card, { x: edgeX, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "power2.out" })
+                  // 2. Stay in center for a while
+                  .to(card, { x: 0, duration: 2 })
+                  // 3. Exit to Edge
+                  .to(card, { x: edgeX, opacity: 0, duration: 1, ease: "power2.in" });
             });
         }
 
