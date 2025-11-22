@@ -484,7 +484,7 @@
                     scrollTrigger: {
                         trigger: card,
                         start: "top 90%", // Enter
-                        end: "top 25%",   // Exit EARLY (Before hitting header)
+                        end: "top 15%",   // Exit EARLY (15% down from top)
                         scrub: 1,
                         onEnter: () => {
                             const rect = card.getBoundingClientRect();
