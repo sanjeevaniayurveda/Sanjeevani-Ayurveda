@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#051b11">
-    <title>Sanjivani Ayurved</title>
+    <title>Sanjivani Ayurveda</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,8 +117,22 @@
         .tagline { font-family: 'Manrope', sans-serif; color: rgba(245, 245, 220, 0.8); font-size: 13px; margin-top: 20px; letter-spacing: 0.5px; background: rgba(212,175,55,0.1); display: inline-block; padding: 6px 18px; border-radius: 50px; border: 1px solid rgba(212,175,55,0.3); }
 
         /* --- SQUARE CARD GRID --- */
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 10px; max-width: 900px; margin: 0 auto; }
-        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; } }
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* Default Mobile: 2 cols */
+            gap: 15px; 
+            padding: 0 10px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
+        /* DESKTOP GRID FIX */
+        @media (min-width: 768px) { 
+            .product-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+                gap: 30px; 
+            } 
+        }
         
         .zomato-card {
             background: var(--glass-bg); backdrop-filter: var(--glass-blur);
@@ -152,23 +166,47 @@
         .leaf-red { background-color: #8b0000; }
         .leaf-gold { background-color: #DAA520; }
 
-        /* --- FULL PRODUCT DETAIL VIEW --- */
+        /* --- PRODUCT DETAIL VIEW (DEFAULT MOBILE) --- */
         #view-product-details { padding: 0 0 100px 0; background: var(--deep-green); }
-        .detail-hero-img { width: 100%; height: 350px; object-fit: cover; border-bottom: 4px double var(--dark-gold); mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
+        .detail-hero-img { 
+            width: 100%; 
+            height: 350px; 
+            object-fit: cover; 
+            border-bottom: 4px double var(--dark-gold); 
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%); 
+        }
         .detail-body { padding: 25px; padding-bottom: 100px; }
         .detail-name { font-family: 'Yatra One'; font-size: 36px; color: var(--royal-gold); margin: 0 0 10px; line-height: 1.1; }
         .detail-price-lg { font-family: 'Manrope'; font-weight: 800; font-size: 32px; color: var(--cream); margin-bottom: 20px; }
         .detail-desc { margin-top: 20px; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 20px; }
         .detail-desc li { position: relative; padding-left: 0; margin-bottom: 20px; font-size: 16px; color: rgba(245, 245, 220, 0.9); line-height: 1.6; list-style: none; }
-
-        /* FIXED BOTTOM BAR FOR DETAIL VIEW */
         .detail-bottom-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 90; height: 56px; }
         .detail-add-btn { width: 100%; height: 100%; background: linear-gradient(135deg, #fff, #d4af37); color: #051b11; border: none; border-radius: 16px; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .detail-qty-control { width: 100%; height: 100%; background: var(--royal-gold); color: #051b11; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .detail-qty-btn { background: none; border: none; font-size: 32px; width: 60px; font-weight: 300; color: #051b11; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .detail-qty-val { font-family: 'Manrope'; font-size: 24px; font-weight: 900; }
-
         .back-btn { position: fixed; top: 30px; left: 20px; z-index: 101; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+
+        /* --- PRODUCT DETAIL (DESKTOP FIX) --- */
+        @media (min-width: 768px) {
+            #view-product-details {
+                display: flex; justify-content: center; align-items: center; padding: 40px;
+            }
+            #detail-content {
+                display: grid; grid-template-areas: "img info" "img btn"; grid-template-columns: 1fr 1fr; gap: 40px;
+                max-width: 1000px; width: 100%; background: rgba(20, 50, 35, 0.6); backdrop-filter: blur(20px);
+                padding: 40px; border-radius: 30px; border: var(--sidham-border); align-items: start;
+            }
+            .detail-hero-img { 
+                grid-area: img; width: 100%; height: 450px !important; object-fit: cover;
+                border-radius: 20px; border: 1px solid var(--royal-gold); mask-image: none !important;
+            }
+            .detail-body { grid-area: info; padding: 0 !important; }
+            .detail-bottom-bar { 
+                grid-area: btn; position: static !important; margin-top: 10px; 
+                width: 100%; height: 60px; align-self: start;
+            }
+        }
 
         /* COMMON & ADMIN */
         .royal-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: var(--subtle-border); border-radius: 24px; padding: 25px; margin: 0 20px 40px; position: relative; overflow: hidden; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; }
