@@ -758,13 +758,44 @@
             const unitVal = document.getElementById('edit-unit').value;
             const weight = qtyVal + ' ' + unitVal;
             const descRaw = document.getElementById('edit-desc').value;
+
             if(!name || !price) return alert("Name and Price are required");
             if(!currentBase64 && !id) return alert("Image is required for new products");
+
             const desc = descRaw.split('\n').filter(line => line.trim() !== '');
             const prodData = { name, price, weight, desc };
+            
             if(currentBase64) prodData.image = currentBase64;
+
+            // UI Feedback: Change button state while uploading
+            const saveBtn = document.querySelector('.edit-modal .checkout-btn');
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "SAVING...";
+            saveBtn.disabled = true;
+
             const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products');
-            if(id) { colRef.doc(id).update(prodData).then(() => { closeProductModal(); playZenSound('success'); }); } else { colRef.add(prodData).then(() => { closeProductModal(); playZenSound('success'); }); }
+            
+            // Handlers for success and failure
+            const handleSuccess = () => {
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+                closeProductModal(); 
+                playZenSound('success');
+            };
+
+            const handleError = (error) => {
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+                console.error("Firebase Error:", error);
+                alert("Could not save product!\nReason: " + error.message);
+            };
+
+            // Execute Firebase request with .catch() appended
+            if(id) { 
+                colRef.doc(id).update(prodData).then(handleSuccess).catch(handleError); 
+            } else { 
+                colRef.add(prodData).then(handleSuccess).catch(handleError); 
+            }
         }
 
         window.checkUser = function() { const p = document.getElementById('swift-phone').value; if(p.length < 10) return alert("Enter Valid Phone"); const btn = document.getElementById('btn-check'); btn.innerHTML = "Checking..."; btn.disabled = true; db.collection('artifacts').doc(appId).collection('public').doc('data').collection('customers').doc(p).get().then(doc => { document.getElementById('step-1').style.display = 'none'; document.getElementById('step-2').style.display = 'block'; if(doc.exists) { const d = doc.data(); document.getElementById('order-name').value = d.name; document.getElementById('order-address').value = d.address; document.getElementById('welcome-msg').style.display = 'block'; playZenSound('found'); } btn.innerHTML = `CONTINUE`; btn.disabled = false; }).catch(e => { document.getElementById('step-1').style.display = 'none'; document.getElementById('step-2').style.display = 'block'; btn.disabled = false; }); }
