@@ -457,38 +457,61 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+        
         document.addEventListener('click', (e) => {
             initAudio();
             if(e.target.closest('button') || e.target.closest('a') || e.target.closest('.logo-group') || e.target.closest('.admin-tab') || e.target.closest('.zomato-card')) {
                 if(!e.target.closest('.btn-add-initial') && !e.target.closest('.qty-act') && !e.target.closest('.detail-add-btn') && !e.target.closest('.detail-qty-btn')) playZenSound('click');
             }
         });
+
         function playZenSound(type) {
             if(!audioCtx) initAudio();
-            const t = audioCtx.currentTime; const gain = audioCtx.createGain(); gain.connect(audioCtx.destination);
+            const t = audioCtx.currentTime;
+            
+            // Helper function to create a soft, "plucked" harp/crystal sound
+            function playNote(freq, startTime, duration, volume = 0.05) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine'; // A pure, soft wave
+                osc.frequency.setValueAtTime(freq, startTime);
+                
+                // The Envelope: Soft attack, long echoing fade-out
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(volume, startTime + 0.03); // Soft strike
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // Echoing fade
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            }
+
             if (type === 'click') {
-                const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(880, t);
-                gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
-                osc.connect(gain); osc.start(t); osc.stop(t + 0.5);
-            } else if (type === 'add') {
-                const freqs = [523.25, 659.25, 783.99, 1046.50];
-                freqs.forEach((f, i) => {
-                    const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                    osc.type = 'sine'; osc.frequency.value = f; osc.connect(g); g.connect(audioCtx.destination);
-                    const startT = t + (i * 0.04); g.gain.setValueAtTime(0, startT); g.gain.linearRampToValueAtTime(0.08, startT + 0.02); g.gain.exponentialRampToValueAtTime(0.001, startT + 0.8);
-                    osc.start(startT); osc.stop(startT + 1);
+                // A single, elegant high-pitched crystal tap
+                playNote(1046.50, t, 0.6, 0.04); 
+            } 
+            else if (type === 'add') {
+                // A magical, ascending harp glissando (C major chord rolled upwards)
+                const notes = [523.25, 659.25, 783.99, 1046.50]; 
+                notes.forEach((f, i) => {
+                    playNote(f, t + (i * 0.06), 1.5, 0.05);
                 });
-            } else if (type === 'success') {
-                const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
-                osc1.type = 'sine'; osc2.type = 'sine'; osc1.frequency.value = 220; osc2.frequency.value = 222;
-                const masterG = audioCtx.createGain(); osc1.connect(masterG); osc2.connect(masterG); masterG.connect(audioCtx.destination);
-                masterG.gain.setValueAtTime(0, t); masterG.gain.linearRampToValueAtTime(0.3, t + 0.5); masterG.gain.exponentialRampToValueAtTime(0.001, t + 4.0);
-                osc1.start(t); osc2.start(t); osc1.stop(t + 4.0); osc2.stop(t + 4.0);
+            } 
+            else if (type === 'success') {
+                // A rich, grand, royal chord that rings out
+                const chord = [261.63, 329.63, 392.00, 493.88]; // Cmaj7 chord
+                chord.forEach(f => {
+                    playNote(f, t, 3.5, 0.06);
+                });
                 if(navigator.vibrate) navigator.vibrate([50, 100, 50]);
-            } else if (type === 'found') {
-                const osc = audioCtx.createOscillator(); osc.type = 'triangle'; osc.frequency.setValueAtTime(880, t);
-                gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.05, t + 0.1); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
-                osc.connect(gain); osc.start(t); osc.stop(t + 0.6);
+            } 
+            else if (type === 'found') {
+                // An elegant two-note "doorbell" chime 
+                playNote(659.25, t, 1.2, 0.05);       
+                playNote(880.00, t + 0.25, 2.0, 0.06); 
             }
         }
 
